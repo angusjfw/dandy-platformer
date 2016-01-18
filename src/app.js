@@ -4,10 +4,11 @@ var game = new Phaser.Game(
   { preload: preload, create: create, update: update, render: render }
 );
 
-var game, cursors, player, platforms, ground, ledge;
+var game, cursors, player, platforms, ledge;
 
 function preload() {
-  game.load.image('sky', 'assets/BG.png');
+  game.load.image('sky', 'assets/bg-tile.png');
+  game.load.image('hills', 'assets/BG.png');
   game.load.image('player', 'assets/dandy.png');
   game.load.image('particle', 'assets/white-smoke.png');
   game.load.image('platform', 'assets/platform.png');
@@ -15,7 +16,9 @@ function preload() {
 
 function create() {
   game.physics.startSystem(Phaser.Physics.ARCADE);
-  game.add.sprite(0, 0, 'sky');
+  game.world.setBounds(0, 0, 8000, 6000);
+  game.add.tileSprite(0, 0, 8000, 6000, 'hills');
+  game.add.tileSprite(0, 0, 8000, 5400, 'sky');
 
   emitter = game.add.emitter(game.world.centerX, 500, 400);
   emitter.makeParticles('particle');
@@ -26,17 +29,19 @@ function create() {
 
   platforms = game.add.group();
   platforms.enableBody = true;
-  ground = platforms.create(-60, game.world.height - 24, 'platform');
-  ground.scale.setTo(3, 3);
-  ledge = platforms.create(400, 400, 'platform');
-  ledge = platforms.create(-150, 250, 'platform');
+  ledge = platforms.create(240, 200, 'platform');
+  ledge = platforms.create(500, 500, 'platform');
+  ledge = platforms.create(700, 5700, 'platform');
+  ledge = platforms.create(400, 5850, 'platform');
   platforms.setAll('body.immovable', true);
  
-  player = game.add.sprite(32, game.world.height - 150, 'player');
+  player = game.add.sprite(0, 0, 'player');
   game.physics.arcade.enable(player);
   player.body.setSize(20, 58, 18, 6);
+  player.body.collideWorldBounds = true;
 
   cursors = game.input.keyboard.createCursorKeys();
+  game.camera.follow(player);
 }
 
 function update() {
@@ -44,11 +49,12 @@ function update() {
   processControls(player);
   applyPlayerDrag(player);
   emitTrail();
-  game.world.wrap(player, 20);
 }
 
 function render() {
   //game.debug.body(player);
+  game.debug.cameraInfo(game.camera, 32, 32);
+  game.debug.spriteCoords(player, 32, 500);
 }
 
 function processControls(player) {
