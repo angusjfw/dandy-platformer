@@ -1,7 +1,7 @@
 var game = new Phaser.Game(
   800, 600,
   Phaser.AUTO, '',
-  { preload: preload, create: create, update: update }
+  { preload: preload, create: create, update: update, render: render }
 );
 
 var game, cursors, player, platforms, ground, ledge;
@@ -34,16 +34,21 @@ function create() {
  
   player = game.add.sprite(32, game.world.height - 150, 'player');
   game.physics.arcade.enable(player);
+  player.body.setSize(20, 58, 18, 6);
 
   cursors = game.input.keyboard.createCursorKeys();
 }
 
-function update () {
+function update() {
   game.physics.arcade.collide(player, platforms);
   processControls(player);
   applyPlayerDrag(player);
   emitTrail();
   game.world.wrap(player, 20);
+}
+
+function render() {
+  //game.debug.body(player);
 }
 
 function processControls(player) {
@@ -56,7 +61,7 @@ function processControls(player) {
   }
 
   if (cursors.down.isDown) {
-    player.body.gravity.y = 1000;
+    player.body.gravity.y = 500;
   }
   else {
     player.body.gravity.y = 40;
